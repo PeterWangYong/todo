@@ -1,0 +1,19 @@
+li {
+    list-style: none;
+    padding: 5px;
+}
+
+li > .checkbox {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: white;
+    margin-right: 8px;
+    border-radius: 2px;
+    border: 1px #ddd solid;
+}
+
+li.done {
+    color: #888;
+    text-decoration: line-through;
+}

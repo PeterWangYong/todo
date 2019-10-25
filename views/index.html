@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/axios.min.js"></script>
+    <link rel="stylesheet" href="/static/css/todo.css">
+    <title>Todo</title>
+</head>
+<body>
+<div id="app">
+    <h1>Todo List</h1>
+    <ul v-if="taskList.length > 0">
+        <li v-for="task of taskList" :key="task.id" :class="{done: task.done}" @click="taskDone(task)">
+            <span class="checkbox"></span>{{task.title}}
+        </li>
+    </ul>
+    <p v-else>还没有任务哦</p>
+    <input type="text" class="new-task" v-model="newTask" @keyup.enter="handleClick">
+    <button @click="handleClick">New Task</button>
+</div>
+<script>
+    let app = new Vue({
+        el : '#app',
+        data: {
+            taskList: [],
+            newTask: '',
+        },
+        methods: {
+            handleClick: function () {
+                let _this = this;
+                axios.post('/task', {
+                    title: this.newTask
+                }).then(function (response) {
+                        _this.taskList.push(response.data)
+                    });
+                this.newTask = ""
+            },
+            taskDone: function (task) {
+                let _this = this;
+                axios.put("/task/"+task.id, {
+                    done: task.done !== true
+                }).then(function (response) {
+                    let temp = _this.taskList.find(function (item) {
+                        return item.id === task.id
+                    });
+                    temp.done = response.data.done
+                })
+            }
+        },
+        mounted: function () {
+            let _this = this;
+            axios.get('/task')
+                .then(function (response) {
+                    _this.taskList = response.data;
+                    console.log(response)
+                }).catch(function (error) {
+                    console.log(error)
+            })
+        }
+    })
+</script>
+</body>
+</html>
